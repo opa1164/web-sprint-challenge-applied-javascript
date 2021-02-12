@@ -1,3 +1,5 @@
+const { default: axios } = require("axios");
+
 const Card = (article) => {
   // TASK 5
   // ---------------------
@@ -17,6 +19,25 @@ const Card = (article) => {
   //   </div>
   // </div>
   //
+  const card = lazy("div", "card");
+  card.appendChild(lazytxt("div", "headline", article.headline));
+
+  const author = lazy("div", "author");
+  const img = lazy("div", "img-container");
+  const image = document.createElement("img");
+  image.src = article.authorPhoto;
+  img.appendChild(image);
+  author.appendChild(img);
+  const name = lazytxt("span", "", `By ${article.authorName}`);
+  author.appendChild(name);
+  card.appendChild(author);
+
+
+  card.addEventListener('click', (event) => {
+    console.log(article.headline);
+  });
+
+  return card;
 }
 
 const cardAppender = (selector) => {
@@ -28,6 +49,31 @@ const cardAppender = (selector) => {
   // Create a card from each and every article object in the response, using the Card component.
   // Append each card to the element in the DOM that matches the selector passed to the function.
   //
+  axios.get('https://lambda-times-api.herokuapp.com/articles')
+  .then(response => {
+    const data = Object.values(response.data.articles);
+    const card = document.querySelector(selector);
+    data.forEach(function(e){
+      e.forEach(function(a){
+        card.appendChild(Card(a));
+      })
+    })
+  })
+}
+
+function lazy(type, clas){
+  const element = document.createElement(type);
+  element.classList.add(clas);
+  return element;
+}
+function lazytxt(type, clas, txt){
+  const element = document.createElement(type);
+  if(clas != "")
+  {
+    element.classList.add(clas);
+  }
+  element.textContent = txt;
+  return element;
 }
 
 export { Card, cardAppender }
